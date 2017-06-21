@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-
-using API.Helpers;
 
 using Blynclight;
 
@@ -20,11 +16,15 @@ namespace API.Controllers
 
         private readonly int _deviceId = 0;
 
-        public BlyncController()
+        public BlyncController() : this(0)
         {
             _blynclightController = new BlynclightController();
-
             _blynclightController.InitBlyncDevices();
+        }
+
+        public BlyncController(int deviceId)
+        {
+            _deviceId = deviceId;
         }
 
         //[HttpGet]
@@ -40,12 +40,16 @@ namespace API.Controllers
         //    return _blynclightController.GetDeviceType(deviceId);
         //}
 
-        [HttpGet]
+        [HttpPost]
         [Route("api/Blync/On/{deviceId}/{red}/{green}/{blue}")]
-        public bool TurnRGBLedOn([FromBody] int deviceId, byte red, byte green, byte blue)
+        public IHttpActionResult TurnRGBLedOn([FromBody] int deviceId, byte red, byte green, byte blue)
         {
-            return _blynclightController.TurnRGBLedOn(deviceId, red, green, blue);
-            //return _blyncLightHelper.SetColor(deviceId, rgb);
+            if (_blynclightController.TurnRGBLedOn(deviceId, red, green, blue))
+            {
+                return Ok();
+            }
+
+            return NotFound();
         }
 
         //[HttpPost]
@@ -90,7 +94,7 @@ namespace API.Controllers
         [Route("api/Blync/Off/{deviceId}")]
         public void Reset(int deviceId)
         {
-            _blynclightController.TurnLedOff(_deviceId);
+            _blynclightController.TurnLedOff(deviceId);
         }
 
         //[HttpPost]
@@ -105,16 +109,5 @@ namespace API.Controllers
         //        Thread.Sleep(25);
         //    }
         //}
-
-        private async Task<NameValueCollection> GetRequestParameters()
-        {
-            var query = await Request.Content.ReadAsStringAsync();
-
-            var uriBuilder = new UriBuilder(Request.RequestUri) { Query = query };
-            var uri = uriBuilder.Uri;
-
-            NameValueCollection parameters = uri.ParseQueryString();
-            return parameters;
-        }
     }
 }

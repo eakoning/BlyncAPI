@@ -155,6 +155,7 @@
     <Compile Include="Helpers\FlashArguments.cs" />
     <Compile Include="Helpers\FlashCommandParser.cs" />
     <Compile Include="Helpers\RGB.cs" />
+    <Compile Include="Helpers\SomeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
